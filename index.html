@@ -7,8 +7,30 @@
     </head>
     <body>
         <script type="text/javascript">
-            d3.select("body").append("p").text("New paragraph!");
-            // Your beautiful D3 code will go here
+            // Load the CSV file, make sure CSV file is in same directory as index.html
+            d3.csv("AllBirdsv4 Cleaned.csv", function(error, data) {
+                if (error) {
+                    console.error('Error loading CSV file:', error);
+                    return;
+                }
+
+                // Log the data to the console to see its structure using Developer Tools (F12)
+                console.log(data);
+
+                // Example of how to access data in the CSV file, d["column_name"] where d is a row in the CSV file
+                data.forEach(function(d) {
+                    d3.select("body").append("p").text("File ID: " + d["File ID"] + 
+                        ", English Name: " + d["English_name"] + 
+                        ", Vocalization Type: " + d["Vocalization_type"] + 
+                        ", Quality: " + d["Quality"] + 
+                        ", Time: " + d["Time"] + 
+                        ", Date: " + d["Date"] + 
+                        ", X: " + d["X"] + 
+                        ", Y: " + d["Y"]);
+                });
+
+                // Your beautiful D3 code will go here
+            });
         </script>
     </body>
 </html>
