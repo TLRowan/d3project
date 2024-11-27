@@ -4,32 +4,109 @@
         <meta charset="utf-8">
         <title>D3 Test</title>
         <script type="text/javascript" src="d3/d3.v3.min.js"></script>
+        <style>
+            .axis path,
+            .axis line {
+                fill: none;
+                shape-rendering: crispEdges;
+            }
+        </style>
     </head>
     <body>
         <script type="text/javascript">
-            // Load the CSV file, make sure CSV file is in same directory as index.html
+            // Set up the SVG element dimensions
+            var width = 800;
+            var height = 600;
+            var margin = {top: 20, right: 20, bottom: 30, left: 40};
+
+            // Create the SVG element
+            var svg = d3.select("body").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            // Add the background map
+            svg.append("image")
+                .attr("xlink:href", "map.bmp")
+                .attr("x", 0) // Align the left edge of the image with the left edge of the graph
+                .attr("y", 0) // Align the top edge of the image with the top edge of the graph
+                .attr("width", width)
+                .attr("height", height)
+                .attr("preserveAspectRatio", "none"); // Disable aspect ratio preservation to stretch the image
+
+            // Load the CSV file
             d3.csv("AllBirdsv4 Cleaned.csv", function(error, data) {
                 if (error) {
                     console.error('Error loading CSV file:', error);
                     return;
                 }
 
-                // Log the data to the console to see its structure using Developer Tools (F12)
+                // Log the data to the console
                 console.log(data);
 
-                // Example of how to access data in the CSV file, d["column_name"] where d is a row in the CSV file
-                data.forEach(function(d) {
-                    d3.select("body").append("p").text("File ID: " + d["File ID"] + 
-                        ", English Name: " + d["English_name"] + 
-                        ", Vocalization Type: " + d["Vocalization_type"] + 
-                        ", Quality: " + d["Quality"] + 
-                        ", Time: " + d["Time"] + 
-                        ", Date: " + d["Date"] + 
-                        ", X: " + d["X"] + 
-                        ", Y: " + d["Y"]);
+                // Filter the data to include only rows with "Rose-crested Blue Pipit"
+                var filteredData = data.filter(function(d) {
+                    return d.English_name === "Rose-crested Blue Pipit";
                 });
 
-                // Your beautiful D3 code will go here
+                // Parse the data to ensure X and Y are numbers
+                filteredData.forEach(function(d) {
+                    d.X = +d.X;
+                    d.Y = +d.Y;
+                });
+
+                // Set up the scales
+                var xScale = d3.scale.linear()
+                    .domain([0, 200]) // Set the domain from 0 to 200
+                    .range([0, width]);
+
+                var yScale = d3.scale.linear()
+                    .domain([0, 200]) // Set the domain from 0 to 200
+                    .range([height, 0]); // Invert the range to flip the Y axis
+
+                // Set up the axes
+                var xAxis = d3.svg.axis()
+                    .scale(xScale)
+                    .orient("bottom");
+
+                var yAxis = d3.svg.axis()
+                    .scale(yScale)
+                    .orient("left");
+
+                // Add the X axis
+                svg.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(xAxis)
+                    .append("text")
+                    .attr("class", "label")
+                    .attr("x", width)
+                    .attr("y", -6)
+                    .style("text-anchor", "end")
+                    .text("X");
+
+                // Add the Y axis
+                svg.append("g")
+                    .attr("class", "y axis")
+                    .call(yAxis)
+                    .append("text")
+                    .attr("class", "label")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 6)
+                    .attr("dy", ".71em")
+                    .style("text-anchor", "end")
+                    .text("Y");
+
+                // Plot the points
+                svg.selectAll(".dot")
+                    .data(filteredData)
+                    .enter().append("circle")
+                    .attr("class", "dot")
+                    .attr("r", 3.5)
+                    .attr("cx", function(d) { return xScale(d.X); })
+                    .attr("cy", function(d) { return yScale(d.Y); })
+                    .style("fill", "blue");
             });
         </script>
     </body>
