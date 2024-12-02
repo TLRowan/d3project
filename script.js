@@ -18,6 +18,8 @@ svg.append("image")
 
 d3.csv("AllBirdsv4 Cleaned.csv").then(data => {
     const filteredData = data.filter(d => d.English_name === "Rose-crested Blue Pipit");
+    const dumpingSiteData = data.filter( d=> d.English_name === "Dumping Site");
+    const testCallData = data.filter(d=> d.English_name === "Possible Rose-crested Blue Pipit");
     const parseDate = d3.timeParse("%m/%d/%Y");
     filteredData.forEach(d => {
         d.X = +d.X;
@@ -41,6 +43,38 @@ d3.csv("AllBirdsv4 Cleaned.csv").then(data => {
         .attr("cx", d => xScale(d.X))
         .attr("cy", d => yScale(d.Y));
 
+    // Add the red dots for "Dumping Site"
+    const dumpSiteCircles = svg.selectAll(".dumping-site-dot")
+        .data(dumpingSiteData)
+        .enter().append("circle")
+        .attr("class", "dumping-site-dot")
+        .attr("r", 5)
+        .attr("cx", d => xScale(d.X))
+        .attr("cy", d => yScale(d.Y))
+        .style("fill", "red");
+
+    // Handle checkbox toggle
+    d3.select("#toggle-dump-site").on("change", function() {
+        const isChecked = d3.select(this).property("checked");
+        dumpSiteCircles.style("display", isChecked ? null : "none");
+    });
+    // Add orange (colorblind friendly with blue) for "Kasios Test Calls"
+    const testCallCircles = svg.selectAll(".test-calls-dot")
+        .data(testCallData)
+        .enter().append("circle")
+        .attr("class", "test-calls-dot")
+        .attr("r", 3.5)
+        .attr("cx", d => xScale(d.X))
+        .attr("cy", d => yScale(d.Y))
+        .style("fill", "orange");
+    
+    // Handle checkbox toggle
+    d3.select("#toggle-test-calls").on("change", function() {
+        const isChecked = d3.select(this).property("checked");
+        testCallCircles.style("display", isChecked ? null : "none");
+    });
+
+
     const xAxis = d3.axisBottom(xScale);
     const yAxis = d3.axisLeft(yScale);
 
@@ -48,19 +82,38 @@ d3.csv("AllBirdsv4 Cleaned.csv").then(data => {
     const maxDate = d3.max(filteredData, d => d.Date);
 
     const scrubber = d3.select("#scrubber")
-        .attr("max", d3.timeMonth.count(minDate, maxDate) / 6);
+    .attr("max", d3.timeMonth.count(minDate, maxDate) / 6);
 
     scrubber.on("input", function () {
         const scrubValue = +this.value;
         const startDate = d3.timeMonth.offset(minDate, scrubValue * 6);
         const endDate = d3.timeMonth.offset(startDate, 6);
-
+    
         d3.select("#scrubber-label").text(`Showing: ${d3.timeFormat("%b %Y")(startDate)} - ${d3.timeFormat("%b %Y")(endDate)}`);
-
-        circles.style("visibility", d => (d.Date >= startDate && d.Date < endDate) ? "visible" : "hidden");
+    
+        // Check if "Show Historical Data" is enabled
+        const showHistorical = d3.select("#toggle-historical-data").property("checked");
+    
+        circles.style("opacity", d => {
+            if (d.Date >= startDate && d.Date < endDate) {
+                return 1; // Fully visible for points in range
+            } else if (showHistorical & d.Date < endDate) {
+                return 0.3; // Partially visible for points outside range
+            } else {
+                return 0; // Completely hidden for points outside range
+            }
+        });
     });
+    
 
-    scrubber.dispatch("input");
+// Initialize the scrubber
+scrubber.dispatch("input");
+
+// Add an event listener for the "Toggle Historical Data" checkbox
+d3.select("#toggle-historical-data").on("change", function () {
+    scrubber.dispatch("input"); // Reapply scrubber filtering logic
+});
+
 
     const playButton = d3.select("body").append("button")
         .attr("id", "play-button")
