@@ -74,6 +74,46 @@ d3.csv("AllBirdsv4 Cleaned.csv").then(data => {
         testCallCircles.style("display", isChecked ? null : "none");
     });
 
+    const tooltip = d3.select("#tooltip");
+
+    circles.on("mouseover", function (event, d) {
+        const opacity = d3.select(this).style("opacity");
+        if(opacity > 0){
+            tooltip.style("visibility", "visible")
+                .html(`Name: ${d.English_name}<br>Date: ${d3.timeFormat("%b %d, %Y")(d.Date)}<br>X: ${d.X}, Y: ${d.Y}`)
+                .style("left", (event.pageX + 10) + "px") // Adjust position based on mouse location
+                .style("top", (event.pageY - 25) + "px"); // Adjust position to avoid overlapping with cursor
+        }
+        })
+    .on("mouseout", function () {
+        tooltip.style("visibility", "hidden");
+    });
+
+    testCallCircles.on("mouseover", function (event, d) {
+        const opacity = d3.select(this).style("opacity");
+        if(opacity > 0){
+            tooltip.style("visibility", "visible")
+                .html(`Test Call ID: ${d.File_ID}<br>X: ${d.X}, Y: ${d.Y}`)
+                .style("left", (event.pageX + 10) + "px") // Adjust position based on mouse location
+                .style("top", (event.pageY - 25) + "px"); // Adjust position to avoid overlapping with cursor
+        }
+    })
+    .on("mouseout", function () {
+        tooltip.style("visibility", "hidden");
+    });
+
+    dumpSiteCircles.on("mouseover", function (event, d) {
+        const opacity = d3.select(this).style("opacity");
+        if(opacity > 0){
+            tooltip.style("visibility", "visible")
+                .html(`Dump Site<br> X: ${d.X}, Y: ${d.Y}`)
+                .style("left", (event.pageX + 10) + "px") // Adjust position based on mouse location
+                .style("top", (event.pageY - 25) + "px"); // Adjust position to avoid overlapping with cursor
+        }
+    })
+    .on("mouseout", function () {
+        tooltip.style("visibility", "hidden");
+    });
 
     const xAxis = d3.axisBottom(xScale);
     const yAxis = d3.axisLeft(yScale);
@@ -149,6 +189,44 @@ d3.csv("AllBirdsv4 Cleaned.csv").then(data => {
     let isPlaying = false;
     let playInterval;
 
+    // Legend Data
+    const legendData = [
+        { label: "Rose-crested Blue Pipit", color: "blue" },
+        { label: "Dumping Site", color: "red" },
+        { label: "Possible Rose-crested Blue Pipit", color: "orange" }
+    ];
+
+    // Add Legend
+    const legend = d3.select("body")
+        .append("svg")
+        .attr("width", 200)
+        .attr("height", legendData.length * 30)
+        .append("g")
+        .attr("id", "legend");
+
+    legend.selectAll(".legend-item")
+        .data(legendData)
+        .enter()
+        .append("g")
+        .attr("class", "legend-item")
+        .attr("transform", (d, i) => `translate(0, ${i * 30})`)
+        .call(g => {
+            g.append("circle")
+                .attr("r", 5)
+                .attr("cx", 10)
+                .attr("cy", 10)
+                .style("fill", d => d.color);
+
+            g.append("text")
+                .attr("x", 20)
+                .attr("y", 14)
+                .text(d => d.label)
+                .style("font-size", "12px")
+                .attr("alignment-baseline", "middle");
+        });
+
+
+    // Add axes
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", `translate(0,${height})`)
