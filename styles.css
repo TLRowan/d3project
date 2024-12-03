@@ -20,17 +20,38 @@ body {
     padding: 0;
 }
 
+
 #chart-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin: 0 auto;
-    max-width: 800px;
+    margin: 0; /* Remove default margins */
+    padding: 0; /* Remove default padding */
+    display: block; /* Ensure the container behaves like a block element */
+    text-align: left; /* Align text and content to the left */
+}
+
+#controls-container {
+    display: flex; /* Arrange controls and legend in a row */
+    align-items: flex-start; /* Align items to the top */
+    justify-content: flex-start; /* Align items to the left */
+    gap: 20px; /* Space between controls and legend */
 }
 
 #controls {
-    margin-top: -160px; /* Space between chart and controls */
+    text-align: left; /* Left-align the controls */
 }
+
+#legend {
+    text-align: left; /* Left-align the legend items */
+}
+
+.legend-color {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    border: 1px solid black; /* Optional: border for better visibility */
+}
+
+
 
 label {
     display: inline-flex; /* Makes the checkbox and text appear on the same line */
@@ -53,6 +74,14 @@ button {
     pointer-events: none;  /* Prevent the tooltip from interfering with mouse events */
     font-size: 14px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#my_dataviz {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    position: relative;
 }
 
 

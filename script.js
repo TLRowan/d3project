@@ -2,7 +2,7 @@ const width = 800;
 const height = 600;
 const margin = { top: 20, right: 20, bottom: 30, left: 40 };
 
-const svg = d3.select("body").append("svg")
+const svg = d3.select("#chart-container").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
@@ -197,7 +197,7 @@ d3.csv("AllBirdsv4 Cleaned.csv").then(data => {
     ];
 
     // Add Legend
-    const legend = d3.select("body")
+    const legend = d3.select("legend")
         .append("svg")
         .attr("width", 200)
         .attr("height", legendData.length * 30)
