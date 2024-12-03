@@ -74,6 +74,46 @@ d3.csv("AllBirdsv4 Cleaned.csv").then(data => {
         testCallCircles.style("display", isChecked ? null : "none");
     });
 
+    const tooltip = d3.select("#tooltip");
+
+    circles.on("mouseover", function (event, d) {
+        const opacity = d3.select(this).style("opacity");
+        if(opacity > 0){
+            tooltip.style("visibility", "visible")
+                .html(`Name: ${d.English_name}<br>Date: ${d3.timeFormat("%b %d, %Y")(d.Date)}<br>X: ${d.X}, Y: ${d.Y}`)
+                .style("left", (event.pageX + 10) + "px") // Adjust position based on mouse location
+                .style("top", (event.pageY - 25) + "px"); // Adjust position to avoid overlapping with cursor
+        }
+        })
+    .on("mouseout", function () {
+        tooltip.style("visibility", "hidden");
+    });
+
+    testCallCircles.on("mouseover", function (event, d) {
+        const opacity = d3.select(this).style("opacity");
+        if(opacity > 0){
+            tooltip.style("visibility", "visible")
+                .html(`Test Call ID: ${d.File_ID}<br>X: ${d.X}, Y: ${d.Y}`)
+                .style("left", (event.pageX + 10) + "px") // Adjust position based on mouse location
+                .style("top", (event.pageY - 25) + "px"); // Adjust position to avoid overlapping with cursor
+        }
+    })
+    .on("mouseout", function () {
+        tooltip.style("visibility", "hidden");
+    });
+
+    dumpSiteCircles.on("mouseover", function (event, d) {
+        const opacity = d3.select(this).style("opacity");
+        if(opacity > 0){
+            tooltip.style("visibility", "visible")
+                .html(`Dump Site<br> X: ${d.X}, Y: ${d.Y}`)
+                .style("left", (event.pageX + 10) + "px") // Adjust position based on mouse location
+                .style("top", (event.pageY - 25) + "px"); // Adjust position to avoid overlapping with cursor
+        }
+    })
+    .on("mouseout", function () {
+        tooltip.style("visibility", "hidden");
+    });
 
     const xAxis = d3.axisBottom(xScale);
     const yAxis = d3.axisLeft(yScale);
@@ -97,54 +137,96 @@ d3.csv("AllBirdsv4 Cleaned.csv").then(data => {
         circles.style("opacity", d => {
             if (d.Date >= startDate && d.Date < endDate) {
                 return 1; // Fully visible for points in range
-            } else if (showHistorical & d.Date < endDate) {
-                return 0.3; // Partially visible for points outside range
+            } else if (showHistorical && d.Date < endDate) {
+                // Calculate normalized time distance based on the range (startDate to minDate)
+                const totalTimeRange = startDate - minDate;
+                const timeDistance = (startDate - d.Date) / totalTimeRange; // Normalize distance
+                // Map timeDistance to opacity range [0.1, 0.9]
+                const opacity = 0.1 + (0.4 - 0.1) * (1 - timeDistance);
+                return Math.max(0.1, Math.min(opacity, 0.4)); // Clamp between 0.1 and 0.9
             } else {
                 return 0; // Completely hidden for points outside range
             }
-        });
+        });        
     });
-    
 
-// Initialize the scrubber
-scrubber.dispatch("input");
+    // Initialize the scrubber
+    scrubber.dispatch("input");
 
-// Add an event listener for the "Toggle Historical Data" checkbox
-d3.select("#toggle-historical-data").on("change", function () {
-    scrubber.dispatch("input"); // Reapply scrubber filtering logic
-});
+    // Add an event listener for the "Toggle Historical Data" checkbox
+    d3.select("#toggle-historical-data").on("change", function () {
+        scrubber.dispatch("input"); // Reapply scrubber filtering logic
+    });
 
+    const playButton = d3.select("#controls")
+    .append("button")
+    .attr("id", "play-button")
+    .text("Play")
+    .on("click", function () {
+        if (isPlaying) {
+            isPlaying = false;
+            clearInterval(playInterval);
+            playButton.text("Play");
+        } else {
+            isPlaying = true;
+            playButton.text("Pause");
 
-    const playButton = d3.select("body").append("button")
-        .attr("id", "play-button")
-        .text("Play")
-        .on("click", function () {
-            if (isPlaying) {
-                isPlaying = false;
-                clearInterval(playInterval);
-                playButton.text("Play");
-            } else {
-                isPlaying = true;
-                playButton.text("Pause");
+            const scrubber = d3.select("#scrubber");
+            const maxValue = +scrubber.attr("max");
+            let currentValue = +scrubber.property("value");
 
-                const scrubber = d3.select("#scrubber");
-                const maxValue = +scrubber.attr("max");
-                let currentValue = +scrubber.property("value");
-
-                playInterval = setInterval(() => {
-                    if (currentValue >= maxValue) {
-                        currentValue = 0;
-                    } else {
-                        currentValue++;
-                    }
-                    scrubber.property("value", currentValue).dispatch("input");
-                }, 1000);
-            }
-        });
+            playInterval = setInterval(() => {
+                if (currentValue >= maxValue) {
+                    currentValue = 0;
+                } else {
+                    currentValue++;
+                }
+                scrubber.property("value", currentValue).dispatch("input");
+            }, 1000);
+        }
+    });
 
     let isPlaying = false;
     let playInterval;
 
+    // Legend Data
+    const legendData = [
+        { label: "Rose-crested Blue Pipit", color: "blue" },
+        { label: "Dumping Site", color: "red" },
+        { label: "Possible Rose-crested Blue Pipit", color: "orange" }
+    ];
+
+    // Add Legend
+    const legend = d3.select("body")
+        .append("svg")
+        .attr("width", 200)
+        .attr("height", legendData.length * 30)
+        .append("g")
+        .attr("id", "legend");
+
+    legend.selectAll(".legend-item")
+        .data(legendData)
+        .enter()
+        .append("g")
+        .attr("class", "legend-item")
+        .attr("transform", (d, i) => `translate(0, ${i * 30})`)
+        .call(g => {
+            g.append("circle")
+                .attr("r", 5)
+                .attr("cx", 10)
+                .attr("cy", 10)
+                .style("fill", d => d.color);
+
+            g.append("text")
+                .attr("x", 20)
+                .attr("y", 14)
+                .text(d => d.label)
+                .style("font-size", "12px")
+                .attr("alignment-baseline", "middle");
+        });
+
+
+    // Add axes
     svg.append("g")
         .attr("class", "x axis")
         .attr("transform", `translate(0,${height})`)
