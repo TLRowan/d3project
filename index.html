@@ -2,21 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>D3 Test</title>
+    <title>Vast 2018 MC1</title>
     <link rel="stylesheet" href="styles.css"> <!-- Link to CSS file -->
 </head>
 <body>
-    <h1>D3 Map with Scrubber</h1>
-    <div id="chart-container">
-        <svg id="chart"></svg>  <!-- Your chart goes here -->
+    <h1>D3 Map of Pipit Locations Over Time</h1>
+    <div id="chart-container"></div>
+    
+    <div id="controls-container">
+        <div id="controls">
+            <input type="checkbox" id="toggle-dump-site" /> Toggle Dumping Site<br>
+            <input type="checkbox" id="toggle-test-calls" /> Toggle Test Calls<br>
+            <input type="checkbox" id="toggle-historical-data" /> Toggle Historical Data<br>
+            <input type="range" id="scrubber" /><span id="scrubber-label"></span><br>
+        </div>
+        <div id="legend">
+            <p><span class="legend-color" style="background-color: blue;"></span> Rose-crested Blue Pipit</p>
+            <p><span class="legend-color" style="background-color: red;"></span> Dumping Site</p>
+            <p><span class="legend-color" style="background-color: orange;"></span> Possible Rose-crested Blue Pipit</p>
+        </div>
     </div>
     
-    <div id="controls">
-        <input type="checkbox" id="toggle-dump-site" /> Toggle Dumping Site<br>
-        <input type="checkbox" id="toggle-test-calls" /> Toggle Test Calls<br>
-        <input type="checkbox" id="toggle-historical-data" /> Toggle Historical Data<br>
-        <input type="range" id="scrubber" /><span id="scrubber-label"></span><br>
-    </div>
     <div id="tooltip" style="position: absolute; visibility: hidden; background-color: lightgray; padding: 5px; border-radius: 5px;"></div>
 
     <script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
