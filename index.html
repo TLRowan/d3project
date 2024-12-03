@@ -3,43 +3,22 @@
 <head>
     <meta charset="utf-8">
     <title>D3 Test</title>
-    <style>
-        .axis path,
-        .axis line {
-            fill: none;
-            shape-rendering: crispEdges;
-        }
-        .dot {
-            fill: blue;
-            opacity: 0.7;
-        }
-
-        .hidden {
-            opacity: 0.1;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to CSS file -->
 </head>
 <body>
     <h1>D3 Map with Scrubber</h1>
-
-    <svg id="chart"></svg>
+    <div id="chart-container">
+        <svg id="chart"></svg>  <!-- Your chart goes here -->
+    </div>
+    
+    <div id="controls">
+        <input type="checkbox" id="toggle-dump-site" /> Toggle Dumping Site<br>
+        <input type="checkbox" id="toggle-test-calls" /> Toggle Test Calls<br>
+        <input type="checkbox" id="toggle-historical-data" /> Toggle Historical Data<br>
+        <input type="range" id="scrubber" /><span id="scrubber-label"></span><br>
+    </div>
+    
     <script type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
     <script type="text/javascript" src="script.js"></script>
-    <div>
-        <label id="scrubber-label">Showing:</label>
-        <input type="range" id="scrubber" min="0" step="1"> 
-        <label>
-            <input type="checkbox" id="toggle-dump-site" checked>
-            Show Dumping Site
-        </label>      
-        <label>
-            <input type="checkbox" id="toggle-test-calls" checked>
-            Show Test Calls
-        </label>
-        <label>
-            <input type="checkbox" id="toggle-historical-data" checked>
-            Show Historical Data
-        </label>    
-    </div>
 </body>
 </html>

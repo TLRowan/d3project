@@ -1,0 +1,52 @@
+/* styles.css */
+.axis path,
+.axis line {
+    fill: none;
+    shape-rendering: crispEdges;
+}
+.dot {
+    fill: blue;
+    opacity: 0.7;
+}
+
+.hidden {
+    opacity: 0.1;
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+#chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0 auto;
+    max-width: 800px;
+}
+
+#controls {
+    margin-top: -160px; /* Space between chart and controls */
+}
+
+label {
+    display: inline-flex; /* Makes the checkbox and text appear on the same line */
+    align-items: center;  /* Vertically aligns checkbox and text */
+}
+
+input[type="checkbox"] {
+    margin-right: 10px; /* Adds space between checkbox and text */
+}
+
+button {
+    margin-top: 10px; /* Adds space between buttons */
+}
+
+
+
+button:hover {
+    background-color: #0056b3;
+}
